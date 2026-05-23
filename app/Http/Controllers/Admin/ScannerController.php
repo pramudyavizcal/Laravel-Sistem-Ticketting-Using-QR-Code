@@ -15,14 +15,14 @@ class ScannerController extends Controller
         $events = Event::withCount([
             'attendees',
             'attendees as checked_in_count' => fn($q) => $q->where('is_checked_in', true),
-        ])->where('is_active', true)->get();
+        ])->visibleTo(auth()->user())->where('is_active', true)->get();
 
         $selectedEvent = null;
         if ($request->event_id) {
             $selectedEvent = Event::withCount([
                 'attendees',
                 'attendees as checked_in_count' => fn($q) => $q->where('is_checked_in', true),
-            ])->find($request->event_id);
+            ])->visibleTo(auth()->user())->findOrFail($request->event_id);
         }
 
         $recentLogs = collect();
@@ -45,6 +45,9 @@ class ScannerController extends Controller
         ]);
 
         $ticketCode = strtoupper(trim($request->ticket_code));
+
+        abort_unless(Event::visibleTo(auth()->user())->whereKey($request->event_id)->exists(), 403);
+
         $attendee = Attendee::where('ticket_code', $ticketCode)
             ->where('event_id', $request->event_id)
             ->with('event')
@@ -109,7 +112,9 @@ class ScannerController extends Controller
 
     public function logs(Request $request)
     {
-        $query = ScanLog::with(['attendee', 'event'])->latest();
+        $query = ScanLog::with(['attendee', 'event'])
+            ->whereHas('event', fn ($eventQuery) => $eventQuery->visibleTo(auth()->user()))
+            ->latest();
 
         if ($request->filled('event_id')) {
             $query->where('event_id', $request->event_id);
@@ -119,7 +124,7 @@ class ScannerController extends Controller
         }
 
         $logs = $query->paginate(30)->withQueryString();
-        $events = Event::get();
+        $events = Event::visibleTo(auth()->user())->get();
 
         return view('admin.scan-logs', compact('logs', 'events'));
     }

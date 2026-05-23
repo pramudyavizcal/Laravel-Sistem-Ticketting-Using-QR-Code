@@ -11,6 +11,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (! auth()->user()->isSuperAdmin()) {
+            return redirect()->route('admin.events.index');
+        }
+
         $stats = [
             'total_events' => Event::count(),
             'active_events' => Event::where('is_active', true)->count(),

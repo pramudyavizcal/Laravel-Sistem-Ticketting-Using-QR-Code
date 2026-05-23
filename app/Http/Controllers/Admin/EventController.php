@@ -14,7 +14,7 @@ class EventController extends Controller
         $events = Event::withCount([
             'attendees',
             'attendees as checked_in_count' => fn($q) => $q->where('is_checked_in', true),
-        ])->latest()->paginate(12);
+        ])->visibleTo(auth()->user())->latest()->paginate(12);
 
         return view('admin.events.index', compact('events'));
     }
@@ -60,6 +60,8 @@ class EventController extends Controller
         $validated['allow_manual_transfer'] = $request->boolean('allow_manual_transfer', true);
         $validated['allow_xendit'] = $request->boolean('allow_xendit', false);
 
+        $validated['created_by'] = auth()->id();
+
         Event::create($validated);
 
         return redirect()->route('admin.events.index')
@@ -68,6 +70,8 @@ class EventController extends Controller
 
     public function show(Event $event)
     {
+        $this->authorizeEvent($event);
+
         $event->load(['attendees' => fn($q) => $q->latest()]);
         $checkedIn = $event->attendees->where('is_checked_in', true)->count();
         $total = $event->attendees->count();
@@ -77,11 +81,15 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
+        $this->authorizeEvent($event);
+
         return view('admin.events.edit', compact('event'));
     }
 
     public function update(Request $request, Event $event)
     {
+        $this->authorizeEvent($event);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:wisuda,seminar,konser,workshop',
@@ -127,6 +135,8 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
+        $this->authorizeEvent($event);
+
         if ($event->logo_path)
             Storage::disk('public')->delete($event->logo_path);
         if ($event->banner_path)
@@ -139,7 +149,14 @@ class EventController extends Controller
 
     public function toggleStatus(Event $event)
     {
+        $this->authorizeEvent($event);
+
         $event->update(['is_active' => !$event->is_active]);
         return back()->with('success', 'Status event diperbarui!');
+    }
+
+    private function authorizeEvent(Event $event): void
+    {
+        abort_if(! auth()->user()->isSuperAdmin() && $event->created_by !== auth()->id(), 403);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AttendeeController;
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -54,6 +55,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Superadmin
+    Route::middleware('superadmin')->group(function () {
+        Route::resource('admin-users', AdminUserController::class)
+            ->parameters(['admin-users' => 'adminUser'])
+            ->except(['show']);
+        Route::get('settings/branding', [SiteSettingController::class, 'edit'])->name('settings.branding');
+        Route::put('settings/branding', [SiteSettingController::class, 'update'])->name('settings.branding.update');
+    });
+
     // Events
     Route::resource('events', EventController::class);
     Route::post('events/{event}/toggle', [EventController::class, 'toggleStatus'])->name('events.toggle');
@@ -74,7 +84,4 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('profile/password', [ProfileController::class, 'changePassword'])->name('profile.password');
 
-    // Settings
-    Route::get('settings/branding', [SiteSettingController::class, 'edit'])->name('settings.branding');
-    Route::put('settings/branding', [SiteSettingController::class, 'update'])->name('settings.branding.update');
 });

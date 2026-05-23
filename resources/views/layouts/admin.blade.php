@@ -895,11 +895,17 @@
         </div>
 
         <nav class="sidebar-nav">
-            <div class="nav-section-label">Overview</div>
-            <a href="{{ route('admin.dashboard') }}"
-                class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <i class="fas fa-chart-pie"></i> Dashboard
-            </a>
+            @if(auth()->user()->isSuperAdmin())
+                <div class="nav-section-label">Overview</div>
+                <a href="{{ route('admin.dashboard') }}"
+                    class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <i class="fas fa-chart-pie"></i> Dashboard
+                </a>
+                <a href="{{ route('admin.admin-users.index') }}"
+                    class="nav-item {{ request()->routeIs('admin.admin-users.*') ? 'active' : '' }}">
+                    <i class="fas fa-user-shield"></i> Admin
+                </a>
+            @endif
 
             <div class="nav-section-label">Manajemen</div>
             <a href="{{ route('admin.events.index') }}"
@@ -926,10 +932,12 @@
                 class="nav-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
                 <i class="fas fa-key"></i> Ganti Password
             </a>
-            <a href="{{ route('admin.settings.branding') }}"
-                class="nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
-                <i class="fas fa-palette"></i> Branding
-            </a>
+            @if(auth()->user()->isSuperAdmin())
+                <a href="{{ route('admin.settings.branding') }}"
+                    class="nav-item {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                    <i class="fas fa-palette"></i> Branding
+                </a>
+            @endif
         </nav>
 
         <div class="sidebar-footer">

@@ -16,7 +16,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Administrator',
                 'email' => 'admin@qreticket.id',
                 'password' => Hash::make('admin123'),
-                'role' => 'admin',
+                'role' => 'superadmin',
             ]
         );
 
@@ -26,7 +26,7 @@ class AdminSeeder extends Seeder
                 'name' => 'Staff Scanner',
                 'email' => 'staff@qreticket.id',
                 'password' => Hash::make('staff123'),
-                'role' => 'staff',
+                'role' => 'admin',
             ]
         );
     }

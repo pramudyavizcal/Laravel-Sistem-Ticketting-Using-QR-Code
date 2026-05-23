@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Event extends Model
@@ -27,6 +29,7 @@ class Event extends Model
         'payment_bank_holder',
         'allow_manual_transfer',
         'allow_xendit',
+        'created_by',
     ];
 
     protected $casts = [
@@ -41,6 +44,20 @@ class Event extends Model
     public function attendees(): HasMany
     {
         return $this->hasMany(Attendee::class);
+    }
+
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function scopeVisibleTo(Builder $query, ?User $user): Builder
+    {
+        if (! $user || $user->isSuperAdmin()) {
+            return $query;
+        }
+
+        return $query->where('created_by', $user->id);
     }
 
     public function scanLogs(): HasMany

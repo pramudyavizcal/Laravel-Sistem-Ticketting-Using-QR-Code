@@ -15,7 +15,8 @@ class AttendeeController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Attendee::with('event');
+        $query = Attendee::with('event')
+            ->whereHas('event', fn ($eventQuery) => $eventQuery->visibleTo(auth()->user()));
 
         if ($request->filled('event_id')) {
             $query->where('event_id', $request->event_id);
@@ -38,15 +39,18 @@ class AttendeeController extends Controller
         }
 
         $attendees = $query->latest()->paginate(20)->withQueryString();
-        $events = Event::where('is_active', true)->get();
+        $events = $this->visibleEvents()->where('is_active', true)->get();
 
         return view('admin.attendees.index', compact('attendees', 'events'));
     }
 
     public function create(Request $request)
     {
-        $events = Event::where('is_active', true)->get();
-        $selectedEvent = $request->event_id ? Event::find($request->event_id) : null;
+        $events = $this->visibleEvents()->where('is_active', true)->get();
+        $selectedEvent = $request->event_id
+            ? $this->visibleEvents()->findOrFail($request->event_id)
+            : null;
+
         return view('admin.attendees.create', compact('events', 'selectedEvent'));
     }
 
@@ -65,6 +69,8 @@ class AttendeeController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $this->authorizeEventId((int) $validated['event_id']);
+
         $validated['ticket_code'] = strtoupper(Str::uuid());
 
         $attendee = Attendee::create($validated);
@@ -79,13 +85,17 @@ class AttendeeController extends Controller
 
     public function show(Attendee $attendee)
     {
+        $this->authorizeAttendee($attendee);
+
         $attendee->load(['event', 'scanLogs' => fn($q) => $q->latest()]);
         return view('admin.attendees.show', compact('attendee'));
     }
 
     public function edit(Attendee $attendee)
     {
-        $events = Event::where('is_active', true)->get();
+        $this->authorizeAttendee($attendee);
+
+        $events = $this->visibleEvents()->where('is_active', true)->get();
         return view('admin.attendees.edit', compact('attendee', 'events'));
     }
 
@@ -104,6 +114,9 @@ class AttendeeController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $this->authorizeAttendee($attendee);
+        $this->authorizeEventId((int) $validated['event_id']);
+
         $attendee->update($validated);
 
         return redirect()->route('admin.attendees.show', $attendee)
@@ -112,6 +125,8 @@ class AttendeeController extends Controller
 
     public function destroy(Attendee $attendee)
     {
+        $this->authorizeAttendee($attendee);
+
         $attendee->delete();
         return redirect()->route('admin.attendees.index')
             ->with('success', 'Peserta berhasil dihapus!');
@@ -123,6 +138,8 @@ class AttendeeController extends Controller
             'event_id' => 'required|exists:events,id',
             'csv_file' => 'required|file|mimes:csv,txt|max:5120',
         ]);
+
+        $this->authorizeEventId((int) $request->event_id);
 
         $file = $request->file('csv_file');
         $handle = fopen($file->getPathname(), 'r');
@@ -168,6 +185,8 @@ class AttendeeController extends Controller
 
     public function resetCheckin(Attendee $attendee)
     {
+        $this->authorizeAttendee($attendee);
+
         $attendee->update([
             'is_checked_in' => false,
             'checked_in_at' => null,
@@ -178,6 +197,8 @@ class AttendeeController extends Controller
 
     public function approve(Attendee $attendee)
     {
+        $this->authorizeAttendee($attendee);
+
         $updateData = [
             'registration_status' => 'approved',
         ];
@@ -203,6 +224,8 @@ class AttendeeController extends Controller
 
     public function reject(Request $request, Attendee $attendee)
     {
+        $this->authorizeAttendee($attendee);
+
         $request->validate(['reason' => 'nullable|string|max:255']);
 
         $attendee->update([
@@ -213,5 +236,25 @@ class AttendeeController extends Controller
         // TODO: Kirim email penolakan di tahap 3
 
         return back()->with('success', "Pendaftaran {$attendee->name} telah ditolak.");
+    }
+
+    private function visibleEvents()
+    {
+        return Event::visibleTo(auth()->user());
+    }
+
+    private function authorizeAttendee(Attendee $attendee): void
+    {
+        $attendee->loadMissing('event');
+
+        abort_if(
+            ! auth()->user()->isSuperAdmin() && $attendee->event?->created_by !== auth()->id(),
+            403
+        );
+    }
+
+    private function authorizeEventId(int $eventId): void
+    {
+        abort_unless($this->visibleEvents()->whereKey($eventId)->exists(), 403);
     }
 }
