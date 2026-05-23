@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | QR E-Ticket System</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-ticket-alt"></i>
+            <span>ETicket Docs</span>
+        </div>
+        <ul class="nav-links">
+            <li class="nav-item"><a href="#overview" class="nav-link active">Overview</a></li>
+            <li class="nav-item"><a href="#tech-stack" class="nav-link">Tech Stack</a></li>
+            <li class="nav-item"><a href="#key-features" class="nav-link">Fitur Utama</a></li>
+            <li class="nav-item"><a href="#usage-admin" class="nav-link">Panduan Admin</a></li>
+            <li class="nav-item"><a href="#usage-public" class="nav-link">Panduan Peserta</a></li>
+            <li class="nav-item"><a href="#scanner-guide" class="nav-link">Panduan QR Scanner</a></li>
+            <li class="nav-item"><a href="#integration" class="nav-link">Integrasi & Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <section id="overview">
+            <h1>Sistem QR E-Ticket Multifungsi</h1>
+            <p style="font-size: 1.25rem; color: var(--text-muted); margin-bottom: 3rem;">
+                Sebuah solusi manajemen event modern yang memungkinkan penyelenggara (Admin) mengelola event,
+                pendaftaran, dan verifikasi tiket menggunakan teknologi QR Code secara instan.
+            </p>
+        </section>
+
+        <hr style="border: 0; border-top: 1px solid var(--border); margin: 3rem 0;">
+
+        <section id="tech-stack">
+            <h2><i class="fas fa-layer-group"></i> Tech Stack</h2>
+            <div style="margin-top: 1rem;">
+                <span class="tech-tag">Laravel 12 (Stable)</span>
+                <span class="tech-tag">PHP 8.4</span>
+                <span class="tech-tag">MySQL Database</span>
+                <span class="tech-tag">Vanilla CSS (Premium Design)</span>
+                <span class="tech-tag">Xendit PHP SDK v7</span>
+                <span class="tech-tag">Bacon QR Code</span>
+                <span class="tech-tag">GuzzleHTTP</span>
+            </div>
+            <p style="margin-top: 1.5rem; color: var(--text-muted);">
+                Aplikasi ini dibangun menggunakan arsitektur <strong>MVC (Model-View-Controller)</strong> standar
+                Laravel untuk skalabilitas dan keamanan tinggi. Menggunakan database relasional untuk menyimpan data
+                event, peserta, dan scan logs secara real-time.
+            </p>
+        </section>
+
+        <section id="key-features">
+            <h2><i class="fas fa-rocket"></i> Fitur Unggulan</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Multi-Event Management</h3>
+                    <p>Kelola banyak event sekaligus dalam satu dashboard admin yang intuitif.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-money-bill-wave"></i></div>
+                    <h3>Paid & Free Events</h3>
+                    <p>Dukungan tiket berbayar dengan harga kustom dan tiket gratis.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-qrcode"></i></div>
+                    <h3>QR Code Generation</h3>
+                    <p>Generate tiket unik dengan QR Code secara otomatis setelah disetujui.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-envelope-open-text"></i></div>
+                    <h3>Email Notifications</h3>
+                    <p>Notifikasi email otomatis untuk pendaftaran, persetujuan, dan penolakan.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-credit-card"></i></div>
+                    <h3>Xendit Integration</h3>
+                    <p>Pembayaran otomatis via E-Wallet, VA, dan Retail dengan konfirmasi instan.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>Admin QR Scanner</h3>
+                    <p>Scanner berbasis browser untuk verifikasi kehadirian peserta dengan cepat.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="usage-admin">
+            <h2><i class="fas fa-user-shield"></i> Panduan Penggunaan (Admin)</h2>
+            <div class="step-box">
+                <strong>1. Membuat Event</strong><br>
+                Buka menu <em>Events</em> > <em>Add New</em>. Masukkan detail event, kuota, warna tema, dan tentukan
+                apakah event tersebut berbayar atau gratis.
+            </div>
+            <div class="step-box">
+                <strong>2. Konfigurasi Pembayaran</strong><br>
+                Pada halaman Edit Event, Anda bisa memilih metode pembayaran: <strong>Transfer Bank</strong> (manual)
+                atau <strong>Xendit</strong> (otomatis).
+            </div>
+            <div class="step-box">
+                <strong>3. Mengelola Pendaftaran (Attendees)</strong><br>
+                Pada menu <em>Attendees</em>, Anda akan melihat daftar pendaftar. Klik tombol <strong>Approve</strong>
+                untuk menyetujui (tiket akan terkirim ke email peserta) atau <strong>Reject</strong> untuk menolak
+                beserta alasan.
+            </div>
+            <div class="step-box">
+                <strong>4. Dashboard Statistik</strong><br>
+                Lihat ringkasan total event, jumlah pendaftar, dan notifikasi pendaftaran yang butuh persetujuan cepat
+                (<em>Pending Approvals</em>).
+            </div>
+        </section>
+
+        <section id="usage-public">
+            <h2><i class="fas fa-users"></i> Panduan Penggunaan (Peserta)</h2>
+            <div class="step-box">
+                <strong>1. Pendaftaran</strong><br>
+                Pilih event aktif di halaman utama, klik <strong>Daftar Sekarang</strong>, dan isi formulir data diri
+                secara lengkap.
+            </div>
+            <div class="step-box">
+                <strong>2. Pembayaran (Event Berbayar)</strong><br>
+                Jika event berbayar, peserta akan diarahkan ke halaman instruksi. Bisa pilih <strong>Bayar Sekarang
+                    (Xendit)</strong> untuk proses instan atau upload bukti transfer manual.
+            </div>
+            <div class="step-box">
+                <strong>3. Menerima Tiket</strong><br>
+                Setelah disetujui Admin (atau otomatis lunas via Xendit), peserta akan menerima email berisi
+                <strong>Tiket Digital</strong> dengan QR Code unik.
+            </div>
+        </section>
+
+        <section id="scanner-guide">
+            <h2><i class="fas fa-qrcode"></i> Panduan QR Scanner</h2>
+            <p>Admin dapat menggunakan fitur Scanner bawaan untuk absensi di lokasi event:</p>
+            <ul>
+                <li style="margin-left: 1.5rem; margin-bottom: 0.5rem;">Buka menu <strong>Scanner</strong> di Dashboard
+                    Admin menggunakan Smartphone atau Laptop dengan kamera.</li>
+                <li style="margin-left: 1.5rem; margin-bottom: 0.5rem;">Arahkan kamera ke QR Code milik peserta.</li>
+                <li style="margin-left: 1.5rem; margin-bottom: 0.5rem;">Sistem akan memvalidasi data dan menampilkan
+                    status (Success/Already Claimed/Invalid).</li>
+            </ul>
+        </section>
+
+        <section id="integration">
+            <h2><i class="fas fa-cogs"></i> Integrasi & Setup</h2>
+            <h3>Email SMTP</h3>
+            <p>Untuk mengirim email, atur file <code>.env</code> Anda:</p>
+            <pre>MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=465
+MAIL_USERNAME=email@anda.com
+MAIL_PASSWORD=paskod-aplikasi</pre>
+
+            <h3>Xendit Webhook</h3>
+            <p>Agar konfirmasi pembayaran otomatis berjalan, atur Webhook URL di dashboard Xendit (Callback) ke:</p>
+            <pre>https://domainanda.com/api/webhooks/xendit</pre>
+        </section>
+
+        <footer
+            style="margin-top: 6rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem;">
+            &copy; 2026 QR E-Ticket Management System. Premium Documentation Layout.
+        </footer>
+    </main>
+
+    <script>
+        // Simple scroll spy logic
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        window.onscroll = () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>
