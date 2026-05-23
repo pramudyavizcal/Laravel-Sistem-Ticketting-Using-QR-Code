@@ -13,7 +13,6 @@ Pastikan komputer/server sudah memiliki:
 
 - PHP 8.2 atau lebih baru
 - Composer
-- Node.js dan npm
 - MySQL/MariaDB atau SQLite
 - Git
 - Web server lokal seperti Laragon/XAMPP, atau gunakan `php artisan serve`
@@ -35,40 +34,6 @@ Cek versi:
 
     php -v
     composer -V
-    node -v
-    npm -v
-
-Jika memakai Git Bash dan PHP belum terbaca, tambahkan PHP Laragon ke PATH.
-Contoh sementara untuk sesi terminal saat ini:
-
-    export PATH="/c/laragon/bin/php/php-8.4.15:$PATH"
-
-Jika ingin permanen di Git Bash:
-
-    echo 'export PATH="/c/laragon/bin/php/php-8.4.15:$PATH"' >> ~/.bashrc
-    source ~/.bashrc
-
-Sesuaikan nama folder PHP dengan versi yang ada di komputer.
-
-
-2. Ambil Project
-----------------
-
-Jika dari Git:
-
-    cd /c/laragon/www
-    git clone NAMA_REPOSITORY QR-eticket-multifungsi
-    cd QR-eticket-multifungsi
-
-Jika project sudah ada, masuk ke folder project:
-
-    cd /c/laragon/www/QR-eticket-multifungsi
-
-PowerShell:
-
-    cd C:\laragon\www\QR-eticket-multifungsi
-
-
 3. Install Dependency Backend
 -----------------------------
 
@@ -76,40 +41,9 @@ Jalankan:
 
     composer install
 
-Jika di production/cPanel:
 
-    composer install --no-dev --optimize-autoloader
-
-
-4. Install Dependency Frontend
-------------------------------
-
-Jalankan:
-
-    npm install
-
-Untuk development:
-
-    npm run dev
-
-Untuk build production:
-
-    npm run build
-
-
-5. Buat File .env
+4. Buat File .env
 -----------------
-
-Copy file contoh:
-
-PowerShell:
-
-    Copy-Item .env.example .env
-
-Git Bash:
-
-    cp .env.example .env
-
 Lalu edit `.env`.
 
 Contoh konfigurasi lokal dengan MySQL/Laragon:
@@ -147,7 +81,7 @@ Catatan:
 - Jika memakai SQLite, gunakan `DB_CONNECTION=sqlite` dan buat file `database/database.sqlite`.
 
 
-6. Buat Database
+5. Buat Database
 ----------------
 
 Jika memakai MySQL/Laragon:
@@ -157,20 +91,10 @@ Jika memakai MySQL/Laragon:
 
        qr_eticket
 
-3. Pastikan nama database sama dengan `DB_DATABASE` di `.env`.
-
-Jika memakai SQLite:
-
-PowerShell:
-
-    New-Item database/database.sqlite -ItemType File
-
-Git Bash:
-
-    touch database/database.sqlite
+3. Pastikan nama database sama dengan `DB_DATABASE` di `.env`. lalu import db .sql nya
 
 
-7. Generate APP_KEY
+6. Generate APP_KEY
 -------------------
 
 Jalankan:
@@ -178,7 +102,7 @@ Jalankan:
     php artisan key:generate
 
 
-8. Migrasi Database dan Seeder
+7. Migrasi Database dan Seeder
 ------------------------------
 
 Untuk setup awal bersih:
@@ -201,7 +125,7 @@ Jika tidak ingin menghapus data lama, gunakan:
     php artisan db:seed
 
 
-9. Buat Storage Link
+8. Buat Storage Link
 --------------------
 
 Wajib untuk upload banner event, logo event, dan bukti pembayaran.
@@ -217,7 +141,7 @@ Jika gambar tidak tampil, cek:
 - file benar-benar tersimpan di `storage/app/public`
 
 
-10. Bersihkan Cache Konfigurasi
+9. Bersihkan Cache Konfigurasi
 -------------------------------
 
 Setelah mengubah `.env`, jalankan:
@@ -231,33 +155,22 @@ Untuk production setelah konfigurasi final:
     php artisan view:cache
 
 
-11. Jalankan Project Lokal
+10. Jalankan Project Lokal
 --------------------------
 
 Terminal 1:
 
-    php artisan serve --host=127.0.0.1 --port=8000
+    php artisan serve
 
 Buka:
 
     http://localhost:8000
 
-Jika sedang development frontend, jalankan terminal 2:
-
-    npm run dev
-
 Jika memakai queue database, jalankan terminal 3:
 
     php artisan queue:work
 
-Project ini juga punya script development gabungan:
-
-    composer run dev
-
-Script tersebut menjalankan server Laravel, queue listener, log viewer, dan Vite.
-
-
-12. Login Admin
+11. Login Admin
 ---------------
 
 Buka:
@@ -279,7 +192,7 @@ Setelah masuk, admin bisa mengakses:
 - Profile
 
 
-13. Buat Event dari Admin Panel
+12. Buat Event dari Admin Panel
 -------------------------------
 
 Masuk ke:
@@ -317,7 +230,7 @@ Jika event berbayar:
 Pastikan event aktif dan tanggal event belum lewat. Landing page hanya menampilkan event aktif yang tanggalnya masih berjalan/akan datang.
 
 
-14. Cek Landing Page
+13. Cek Landing Page
 --------------------
 
 Buka:
@@ -334,7 +247,7 @@ Yang perlu dicek:
 - Tombol pagination dan panah halaman bekerja.
 
 
-15. Alur Pendaftaran Peserta
+14. Alur Pendaftaran Peserta
 ----------------------------
 
 Dari landing page:
@@ -365,18 +278,26 @@ Jika event berbayar Xendit:
 - Tiket QR dikirim otomatis jika email aktif.
 
 
-16. Setup Email
+15. Setup Email
 ---------------
 
-Default local:
+Fitur email dipakai untuk:
+
+- konfirmasi pendaftaran
+- pengiriman tiket QR setelah approval
+- notifikasi penolakan atau status pendaftaran
+
+Mode paling aman untuk local development adalah `log`.
 
     MAIL_MAILER=log
 
-Email tidak benar-benar dikirim, tetapi isi email bisa dicek di:
+Kalau memakai mode ini, email tidak benar-benar dikirim ke inbox. Isi email akan masuk ke:
 
     storage/logs/laravel.log
 
-Contoh SMTP Mailtrap:
+Ini cocok untuk testing tanpa takut mengirim email asli.
+
+Kalau ingin email benar-benar terkirim, ganti ke SMTP. Contoh jika menggunakan Mailtrap:
 
     MAIL_MAILER=smtp
     MAIL_HOST=sandbox.smtp.mailtrap.io
@@ -398,15 +319,27 @@ Contoh SMTP Gmail:
     MAIL_FROM_ADDRESS="alamat@gmail.com"
     MAIL_FROM_NAME="${APP_NAME}"
 
-Setelah mengubah email:
+Cara pakai:
+
+1. Isi konfigurasi mail di `.env`.
+2. Jalankan `php artisan optimize:clear`.
+3. Buat pendaftaran peserta.
+4. Approve dari admin.
+5. Cek apakah email tiket masuk ke inbox atau ke log.
+
+Catatan penting:
+
+- Jika pakai Gmail, gunakan App Password, bukan password akun biasa.
+- Pastikan `MAIL_FROM_ADDRESS` valid agar mail tidak ditolak provider.
+
+Setelah mengubah konfigurasi email:
 
     php artisan optimize:clear
 
-Uji dengan membuat pendaftaran lalu approve peserta dari admin.
-
-
-17. Setup Xendit
+16. Setup Xendit
 ----------------
+
+Xendit dipakai untuk event berbayar kalau ingin peserta membayar lewat invoice/payment link.
 
 Isi `.env`:
 
@@ -418,6 +351,16 @@ Pastikan `config/services.php` membaca key:
     xendit.key
     xendit.callback_token
 
+Alur pakai:
+
+1. Aktifkan event berbayar.
+2. Aktifkan opsi Xendit di form event.
+3. Isi `XENDIT_SECRET_KEY` dan `XENDIT_CALLBACK_TOKEN`.
+4. Peserta daftar event dan klik bayar via Xendit.
+5. Xendit membuat invoice/payment link.
+6. Setelah pembayaran sukses, webhook akan mengubah status peserta menjadi `approved` dan `paid`.
+7. Tiket QR bisa dikirim otomatis jika email aktif.
+
 Setelah mengubah `.env`:
 
     php artisan optimize:clear
@@ -426,11 +369,11 @@ Untuk testing webhook lokal, gunakan tunnel seperti ngrok:
 
     ngrok http 8000
 
-Ambil URL HTTPS dari ngrok, lalu set webhook invoice di dashboard Xendit:
+Ambil URL HTTPS dari ngrok, lalu set webhook invoice di dashboard Xendit ke:
 
     https://URL-NGROK/api/webhooks/xendit
 
-Header callback token di Xendit harus sama dengan `XENDIT_CALLBACK_TOKEN`.
+Header callback token di Xendit harus sama persis dengan `XENDIT_CALLBACK_TOKEN`.
 
 Alur uji:
 
@@ -443,7 +386,7 @@ Alur uji:
 7. Pastikan tiket muncul/terkirim.
 
 
-18. QR Ticket dan Scanner
+17. QR Ticket dan Scanner
 -------------------------
 
 Setelah peserta approved:
@@ -471,7 +414,7 @@ Catatan:
 - Untuk production, pastikan website memakai HTTPS.
 
 
-19. Import Peserta CSV
+18. Import Peserta CSV
 ----------------------
 
 Masuk:
@@ -491,7 +434,7 @@ Contoh:
 Setelah import, peserta mendapatkan ticket_code otomatis.
 
 
-20. Checklist Fitur Berfungsi
+19. Checklist Fitur Berfungsi
 -----------------------------
 
 Gunakan checklist ini setelah setup:
@@ -515,7 +458,7 @@ Gunakan checklist ini setelah setup:
 [ ] Xendit webhook berjalan jika payment gateway dipakai.
 
 
-21. Deployment ke Hosting/cPanel
+20. Deployment ke Hosting/cPanel
 --------------------------------
 
 Langkah umum:
@@ -529,14 +472,11 @@ Langkah umum:
 
        composer install --no-dev --optimize-autoloader
 
-4. Jika build frontend dilakukan di lokal, upload folder:
+4. Jika kamu mengubah asset frontend dan membangunnya di lokal, upload folder:
 
        public/build
 
-   Jika hosting mendukung Node:
-
-       npm install
-       npm run build
+   Catatan: untuk kondisi normal aplikasi ini tidak perlu `npm` saat dijalankan.
 
 5. Buat `.env` production:
 
@@ -567,7 +507,7 @@ Langkah umum:
        php artisan queue:work --tries=3
 
 
-22. Troubleshooting
+21. Troubleshooting
 -------------------
 
 Masalah: `php` tidak dikenali.
@@ -642,17 +582,15 @@ Solusi:
 - Pastikan folder `storage` dan `bootstrap/cache` writable.
 
 
-23. Command Cepat Setup Lokal
+22. Command Cepat Setup Lokal
 -----------------------------
 
 Jika database dan `.env` sudah benar:
 
     composer install
-    npm install
     php artisan key:generate
     php artisan migrate:fresh --seed
     php artisan storage:link
-    npm run build
     php artisan optimize:clear
     php artisan serve --host=127.0.0.1 --port=8000
 
@@ -664,4 +602,3 @@ Login admin:
 
     http://localhost:8000/login
     admin@qreticket.id / admin123
-
